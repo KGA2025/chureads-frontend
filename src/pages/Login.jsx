@@ -1,10 +1,13 @@
 import React from "react";
 import InputField from "../components/InputField";
 import LoginButton from "../components/LoginButton";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../firebase";
 
 const Login = () => {
   // logic
+  const history = useNavigate(); // history에는 함수가 할당된다
 
   const handleInputChange = (inputValue, field) => {
     // TODO: 사용자 입력 기능 구현
@@ -14,8 +17,18 @@ const Login = () => {
     // TODO: 로그인 기능 구현
   };
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
     // TODO: 구글 로그인 구현
+    // 구글 provider
+    const provider = new GoogleAuthProvider(); // 구글 로그인 팝업을 띄울 수 있게 해줌
+    try {
+      // 1. 팝업 띄워서 로그인
+      await signInWithPopup(auth, provider);
+      // 2. 홈 화면으로 리다이렌트
+      history("/");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   // view
