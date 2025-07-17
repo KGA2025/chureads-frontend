@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import InputField from "../components/InputField";
 import LoginButton from "../components/LoginButton";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,6 +13,10 @@ import { useState } from "react";
 const Login = () => {
   // logic
   const history = useNavigate();
+
+  const currentUser = auth.currentUser;
+  console.log("🚀 ~ Home ~ currentUser:", currentUser);
+  const isLoggedIn = !!currentUser; // !!를 붙일 시 무조건 boolean형태로 바꿔줌
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -73,6 +77,12 @@ const Login = () => {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    // login페이지 진입 시, 로그인되어 있는 사용자는 home 페이지로 이동
+    isLoggedIn && history("/");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // view
   return (
