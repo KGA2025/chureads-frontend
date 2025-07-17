@@ -2,19 +2,18 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/layout/Header";
 import Nav from "../components/layout/Nav";
 import FeedItem from "../components/FeedItem";
-import { initialFeedList, initialTags } from "../data/response";
 import { useNavigate } from "react-router-dom";
 import { auth } from "./../firebase";
 
 const Home = () => {
   // logic
   const history = useNavigate();
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
   const currentUser = auth.currentUser;
-  console.log("🚀 ~ Home ~ currentUser:", currentUser);
   const isLoggedIn = !!currentUser; // !!를 붙일 시 무조건 boolean형태로 바꿔줌
 
-  const [feedList, setFeedList] = useState(initialFeedList);
+  const [feedList, setFeedList] = useState([]);
 
   const handleEdit = (data) => {
     history(`/edit/${data._id}`); // edit페이지로 이동
@@ -45,7 +44,22 @@ const Home = () => {
   useEffect(() => {
     // 페이지 진입시 딱 한번 실행
     // TODO: 백엔드에 Get 요청
-  }, []);
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/posts`);
+        if (!response.ok) {
+          throw new Error(`HTTP error: status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        setFeedList(result);
+        console.log("🚀 ~ fetchPosts ~ result:", result);
+      } catch (error) {
+        console.error("게시물 조회 실패:", error);
+      }
+    };
+    fetchPosts();
+  }, [API_BASE_URL]);
 
   useEffect(() => {
     // home페이지 진입 시, 로그인되지 않은 사용자는 바로 로그인 페이지로 이동
@@ -64,19 +78,24 @@ const Home = () => {
 
         <div>
           {/* START: 피드 영역 */}
-          <ul>
-            {feedList.map((feed) => (
-              <FeedItem
-                key={feed._id}
-                data={feed}
-                tags={initialTags}
-                isAuthor={true}
-                onDelete={handleDelete}
-                onEdit={handleEdit}
-                onLike={handleLike}
-              />
-            ))}
-          </ul>
+          {feedList.length ? (
+            <ul>
+              {feedList.map((feed) => (
+                <FeedItem
+                  key={feed._id}
+                  data={feed}
+                  tags={feed.tags}
+                  isAuthor={feed.userId === currentUser.uid}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                  onLike={handleLike}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p>No Data</p>
+          )}
+
           {/* END: 피드 영역 */}
         </div>
       </main>
