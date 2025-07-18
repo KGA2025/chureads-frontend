@@ -10,6 +10,7 @@ const Post = () => {
   const currentUser = auth.currentUser;
 
   const [churead, setChuread] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (value) => {
     setChuread(value); // post 페이지에서 사용자가 입력하는 문구는 churead에 저장됨
@@ -52,6 +53,7 @@ const Post = () => {
     // 빈 스트링이 아닌 경우
     // TODO: 백엔드에 Post 요청
     try {
+      setIsLoading(true);
       const newItem = {
         userName: currentUser.displayName,
         userId: currentUser.uid,
@@ -66,6 +68,8 @@ const Post = () => {
       console.log("🚀 ~ handlePost ~ result:", result);
     } catch (error) {
       console.error("게시글 추가 에러:", error);
+    } finally {
+      setIsLoading(false);
     }
 
     history("/"); // home화면으로 이동
@@ -105,7 +109,7 @@ const Post = () => {
                 type="submit"
                 className="ml-auto px-5 py-2 bg-white text-churead-black rounded-3xl font-bold"
               >
-                게시
+                {isLoading ? "Loading..." : "게시"}
               </button>
             </div>
             {/* END: 게시 버튼 영역 */}
