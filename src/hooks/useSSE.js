@@ -8,7 +8,7 @@ import useNotification from "./useNotification";
  */
 
 const useSSE = () => {
-  const [isConnected, setIsConnected] = useState(false);
+  const [isConnected, setIsConnected] = useState(false); // 연결 상태 저장
   const eventSourceRef = useRef(null);
 
   // 알림 기능을 위한 훅 사용
